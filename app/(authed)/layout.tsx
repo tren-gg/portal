@@ -6,10 +6,10 @@ export default async function AuthedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await requireSession();
+  const { me } = await requireSession();
 
-  const handle = session.email;
-  const initials = session.email.charAt(0).toUpperCase();
+  const handle = me.user.email;
+  const initials = me.user.email.charAt(0).toUpperCase();
 
   return (
     <div className="portal">

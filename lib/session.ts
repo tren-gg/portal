@@ -19,6 +19,23 @@ export type PkceData = {
   plan: string | null;
 };
 
+export function hasCompleteSession(session: Partial<SessionData>): session is SessionData {
+  return (
+    typeof session.accessToken === "string" &&
+    session.accessToken.length > 0 &&
+    typeof session.refreshToken === "string" &&
+    session.refreshToken.length > 0 &&
+    typeof session.accessExpiresAt === "string" &&
+    session.accessExpiresAt.length > 0 &&
+    typeof session.refreshExpiresAt === "string" &&
+    session.refreshExpiresAt.length > 0 &&
+    typeof session.userId === "string" &&
+    session.userId.length > 0 &&
+    typeof session.email === "string" &&
+    session.email.length > 0
+  );
+}
+
 const sessionOptions: SessionOptions = {
   password: env.SESSION_PASSWORD,
   cookieName: env.SESSION_COOKIE_NAME,

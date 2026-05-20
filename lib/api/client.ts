@@ -24,6 +24,10 @@ export function getApiErrorMessage(error: unknown, fallback = "Request failed. P
   return fallback;
 }
 
+export function isUnauthorizedApiError(error: unknown) {
+  return error instanceof ApiError && error.status === 401;
+}
+
 async function refreshTokens(session: SessionData): Promise<boolean> {
   const res = await fetch(`${env.API_URL}/oauth/token`, {
     method: "POST",
