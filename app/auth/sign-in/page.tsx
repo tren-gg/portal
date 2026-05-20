@@ -14,18 +14,23 @@ export default async function SignInPage({
 }: {
   searchParams: Promise<{ plan?: string; next?: string; error?: string }>;
 }) {
+  const params = await searchParams;
+  const next = getSafeNextPath(params.next);
+  const plan = getSafePlan(params.plan);
   const session = await getSession();
   const sessionData: Partial<SessionData> = session;
 
   if (hasCompleteSession(sessionData)) {
-    redirect("/dashboard");
+    if (next === "/subscribe" && plan) {
+      redirect(`/subscribe?plan=${encodeURIComponent(plan)}`);
+    }
+
+    redirect(next ?? "/dashboard");
   }
 
   if (sessionData.accessToken) {
     redirect("/auth/reset");
   }
-
-  const params = await searchParams;
 
   async function handleSignIn(formData: FormData) {
     "use server";
@@ -42,8 +47,8 @@ export default async function SignInPage({
     const pkce = await getPkceSession();
     pkce.verifier = verifier;
     pkce.state = state;
-    pkce.next = getSafeNextPath(params.next);
-    pkce.plan = getSafePlan(params.plan);
+    pkce.next = next;
+    pkce.plan = plan;
     await pkce.save();
 
     try {
