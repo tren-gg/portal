@@ -1,14 +1,27 @@
 import { env } from "@/lib/env";
 import { getSession, type SessionData } from "@/lib/session";
+import type { ApiErrorBody } from "./types";
 
 export class ApiError extends Error {
   constructor(
     public status: number,
-    public body: { error: string; message: string; details?: Record<string, string[]> } | null,
+    public body: ApiErrorBody | null,
   ) {
-    super(body?.message ?? `API responded with ${status}`);
+    super(body?.error.message ?? `API responded with ${status}`);
     this.name = "ApiError";
   }
+}
+
+export function getApiErrorMessage(error: unknown, fallback = "Request failed. Please try again.") {
+  if (error instanceof ApiError) {
+    return error.body?.error.message ?? fallback;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return fallback;
 }
 
 async function refreshTokens(session: SessionData): Promise<boolean> {

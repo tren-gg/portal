@@ -1,7 +1,50 @@
 import { ScreenHead } from "@/components/screen-head";
-import { getDevices, getSubscription } from "@/lib/api/dev-helpers";
+import { getApiErrorMessage } from "@/lib/api/client";
+import { getDevices, getSubscription, renameDevice, revokeDevice } from "@/lib/api/account";
+import { redirect } from "next/navigation";
 
-export default async function DevicesPage() {
+async function renameDeviceAction(formData: FormData) {
+  "use server";
+
+  const id = String(formData.get("id") ?? "");
+  const deviceName = String(formData.get("deviceName") ?? "").trim();
+
+  if (!id || !deviceName) {
+    redirect("/devices?error=Device+name+is+required.");
+  }
+
+  try {
+    await renameDevice(id, deviceName);
+  } catch (error) {
+    redirect(`/devices?error=${encodeURIComponent(getApiErrorMessage(error))}`);
+  }
+
+  redirect("/devices?status=Device+renamed.");
+}
+
+async function revokeDeviceAction(formData: FormData) {
+  "use server";
+
+  const id = String(formData.get("id") ?? "");
+  if (!id) {
+    redirect("/devices?error=Device+is+required.");
+  }
+
+  try {
+    await revokeDevice(id);
+  } catch (error) {
+    redirect(`/devices?error=${encodeURIComponent(getApiErrorMessage(error))}`);
+  }
+
+  redirect("/devices?status=Device+released.");
+}
+
+export default async function DevicesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; status?: string }>;
+}) {
+  const params = await searchParams;
   const [devices, subscription] = await Promise.all([
     getDevices(),
     getSubscription(),
@@ -20,6 +63,27 @@ export default async function DevicesPage() {
       />
 
       <div className="screen-body">
+        {(params.error || params.status) && (
+          <div className="group">
+            <div className="group__l">
+              <h2 className="group__title">
+                {params.error ? "Action failed" : "Updated"}
+              </h2>
+            </div>
+            <div className="group__r">
+              <div className="rowlist">
+                <div className="row">
+                  <div className="row__main">
+                    <div className="row__title">
+                      {params.error ?? params.status}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="group">
           <div className="group__l">
             <h2 className="group__title">Authorized machines</h2>
@@ -58,9 +122,26 @@ export default async function DevicesPage() {
                     </div>
                   </div>
                   <div className="row__right">
-                    <button className="linkbtn linkbtn--muted" type="button">
-                      release seat
-                    </button>
+                    <form action={renameDeviceAction} style={{ display: "flex", gap: 10 }}>
+                      <input type="hidden" name="id" value={d.id} />
+                      <input
+                        className="portal-input"
+                        name="deviceName"
+                        placeholder="nickname"
+                        defaultValue={d.deviceName ?? ""}
+                        aria-label={`Rename ${d.deviceId}`}
+                        style={{ width: 150 }}
+                      />
+                      <button className="linkbtn linkbtn--muted" type="submit">
+                        rename
+                      </button>
+                    </form>
+                    <form action={revokeDeviceAction}>
+                      <input type="hidden" name="id" value={d.id} />
+                      <button className="linkbtn linkbtn--muted" type="submit">
+                        release seat
+                      </button>
+                    </form>
                   </div>
                 </div>
               ))}

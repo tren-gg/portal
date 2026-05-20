@@ -25,7 +25,7 @@ export async function startEmailFlow(email: string, params: {
 
   if (!res.ok) {
     const err = await res.json().catch(() => null);
-    throw new Error(err?.message ?? `Email start failed with ${res.status}`);
+    throw new Error(err?.error?.message ?? `Email start failed with ${res.status}`);
   }
 
   return res.json();
@@ -47,7 +47,7 @@ export async function exchangeCode(code: string, codeVerifier: string): Promise<
 
   if (!res.ok) {
     const err = await res.json().catch(() => null);
-    throw new Error(err?.message ?? `Token exchange failed with ${res.status}`);
+    throw new Error(err?.error?.message ?? `Token exchange failed with ${res.status}`);
   }
 
   return res.json();
