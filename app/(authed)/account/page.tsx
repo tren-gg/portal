@@ -1,5 +1,5 @@
 import { ScreenHead } from "@/components/screen-head";
-import { TwoFactorToggle } from "@/components/security-form";
+import { SecurityForm } from "@/components/security-form";
 import { getMe } from "@/lib/api/me";
 
 export default async function AccountPage() {
@@ -16,10 +16,10 @@ export default async function AccountPage() {
       <div className="screen-body">
         <div className="group">
           <div className="group__l">
-            <h2 className="group__title">Email & password</h2>
+            <h2 className="group__title">Email sign-in</h2>
             <p className="group__caption">
-              Password is verified only in the system browser, never inside the
-              game client.
+              Tren sends one-time links to your email. There is no account
+              password to create, store, or change.
             </p>
           </div>
           <div className="group__r">
@@ -31,18 +31,14 @@ export default async function AccountPage() {
                   value={me.user.email}
                   readOnly
                 />
-                <button className="linkbtn linkbtn--muted" type="button">
-                  change
-                </button>
+                <span className="row__meta">magic links</span>
               </div>
               <div className="form-row">
                 <span className="form-row__label">password</span>
                 <span className="form-row__val form-row__val--muted">
-                  set at account creation
+                  {me.account.auth.hasPassword ? "enabled" : "not used"}
                 </span>
-                <button className="linkbtn linkbtn--muted" type="button">
-                  change
-                </button>
+                <span className="row__meta">-</span>
               </div>
             </div>
           </div>
@@ -52,12 +48,11 @@ export default async function AccountPage() {
           <div className="group__l">
             <h2 className="group__title">Two-factor</h2>
             <p className="group__caption">
-              A six-digit code from your authenticator. Required for new device
-              authorization.
+              Additional verification status for this account.
             </p>
           </div>
           <div className="group__r">
-            <TwoFactorToggle />
+            <SecurityForm auth={me.account.auth} />
           </div>
         </div>
 
@@ -85,7 +80,7 @@ export default async function AccountPage() {
                   </div>
                 </div>
                 <div className="row__right">
-                  <span className="row__meta">—</span>
+                  <span className="row__meta">-</span>
                 </div>
               </div>
             </div>

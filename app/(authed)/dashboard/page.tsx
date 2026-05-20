@@ -165,7 +165,7 @@ export default async function DashboardPage() {
                 <div className="row__main">
                   <div className="row__title">Security settings</div>
                   <div className="row__meta">
-                    <span>email, password, two-factor, sessions</span>
+                    <span>magic email links, sessions, recovery status</span>
                   </div>
                 </div>
                 <div className="row__right">

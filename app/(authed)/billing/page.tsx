@@ -10,7 +10,7 @@ export default async function BillingPage() {
     : null;
 
   const renewLabel = renewDate
-    ? `${renewDate.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })} · ${Math.ceil((renewDate.getTime() - Date.now()) / 86400000)} days`
+    ? renewDate.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
     : "—";
 
   return (

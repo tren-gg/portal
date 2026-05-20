@@ -1,7 +1,10 @@
 import { ScreenHead } from "@/components/screen-head";
 import { ConfigsList } from "@/components/configs-list";
+import { getMe } from "@/lib/api/me";
 
-export default function ConfigsPage() {
+export default async function ConfigsPage() {
+  const me = await getMe();
+
   return (
     <>
       <ScreenHead
@@ -11,7 +14,7 @@ export default function ConfigsPage() {
       />
 
       <div className="screen-body">
-        <ConfigsList />
+        <ConfigsList configs={me.account.savedConfigs} />
       </div>
     </>
   );

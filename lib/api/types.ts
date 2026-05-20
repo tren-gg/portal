@@ -49,6 +49,36 @@ export type MeResponse = {
   clientId: string;
   scope: string;
   accessExpiresAt: string;
+  account: AccountDetails;
+};
+
+export type AccountDetails = {
+  auth: {
+    method: "magic_link";
+    hasPassword: boolean;
+    twoFactorEnabled: boolean;
+    recoveryCodesAvailable: boolean;
+    recoveryCodesRemaining: number;
+  };
+  emailPreferences: EmailPreferences;
+  savedConfigs: SavedConfig[];
+};
+
+export type EmailPreferences = {
+  releases: boolean;
+  security: boolean;
+  changes: boolean;
+  promo: boolean;
+};
+
+export type SavedConfig = {
+  id: string;
+  name: string;
+  minecraftVersion: string;
+  modules: string[];
+  sizeBytes: number;
+  updatedAt: string;
+  active: boolean;
 };
 
 export type SubscriptionStatus = "active" | "trialing" | "past_due" | "canceled";

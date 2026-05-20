@@ -1,36 +1,32 @@
 "use client";
 
 import { useState } from "react";
+import type { EmailPreferences } from "@/lib/api/types";
 
 type ProfileFormProps = {
   email: string;
   initialHandle: string;
   userId: string;
   createdAt: string;
+  initialEmailPreferences: EmailPreferences;
 };
 
-type EmailPrefs = {
-  releases: boolean;
-  security: boolean;
-  changes: boolean;
-  promo: boolean;
-};
-
-const PREF_ITEMS: { key: keyof EmailPrefs; label: string; sub: string }[] = [
+const PREF_ITEMS: { key: keyof EmailPreferences; label: string; sub: string }[] = [
   { key: "releases", label: "build releases", sub: "when a new loader version ships" },
-  { key: "security", label: "security alerts", sub: "new device, password changes, 2fa events" },
+  { key: "security", label: "security alerts", sub: "new sign-ins and device changes" },
   { key: "changes", label: "mapping changes", sub: "when a new minecraft version is supported" },
   { key: "promo", label: "product news", sub: "occasional, never more than once a month" },
 ];
 
-export function ProfileForm({ email, initialHandle, userId, createdAt }: ProfileFormProps) {
+export function ProfileForm({
+  email,
+  initialHandle,
+  userId,
+  createdAt,
+  initialEmailPreferences,
+}: ProfileFormProps) {
   const [handle, setHandle] = useState(initialHandle);
-  const [emailPrefs, setEmailPrefs] = useState<EmailPrefs>({
-    releases: true,
-    security: true,
-    changes: true,
-    promo: false,
-  });
+  const [emailPrefs, setEmailPrefs] = useState<EmailPreferences>(initialEmailPreferences);
 
   const created = new Date(createdAt);
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone.replace("_", " ");

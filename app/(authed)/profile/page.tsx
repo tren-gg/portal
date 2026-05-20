@@ -20,6 +20,7 @@ export default async function ProfilePage() {
           initialHandle={handle}
           userId={me.user.id}
           createdAt={me.user.createdAt}
+          initialEmailPreferences={me.account.emailPreferences}
         />
 
         <div className="dark-block">

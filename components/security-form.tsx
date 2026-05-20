@@ -1,32 +1,37 @@
-"use client";
+import type { AccountDetails } from "@/lib/api/types";
 
-import { useState } from "react";
+type SecurityFormProps = {
+  auth: AccountDetails["auth"];
+};
 
-export function TwoFactorToggle() {
-  const [enabled, setEnabled] = useState(true);
-
+export function SecurityForm({ auth }: SecurityFormProps) {
   return (
     <div className="rowlist">
       <div className="form-row">
+        <span className="form-row__label">sign-in method</span>
+        <span className="form-row__val">
+          {auth.method === "magic_link" ? "magic email link" : auth.method}
+        </span>
+        <span className="row__meta">no password</span>
+      </div>
+      <div className="form-row">
         <span className="form-row__label">authenticator</span>
         <span className="form-row__val">
-          {enabled ? "enabled · added 04 Jan 2026" : "not enabled"}
+          {auth.twoFactorEnabled ? "enabled" : "not enabled"}
         </span>
-        <button
-          className={`toggle ${enabled ? "toggle--on" : ""}`}
-          onClick={() => setEnabled(!enabled)}
-          aria-label="toggle 2fa"
-          type="button"
-        />
+        <span className={`tag ${auth.twoFactorEnabled ? "tag--active" : "tag--off"}`}>
+          <span className="dot" />
+          {auth.twoFactorEnabled ? "on" : "off"}
+        </span>
       </div>
       <div className="form-row">
         <span className="form-row__label">recovery codes</span>
         <span className="form-row__val form-row__val--muted">
-          10 unused · generated 04 Jan 2026
+          {auth.recoveryCodesAvailable
+            ? `${auth.recoveryCodesRemaining} unused`
+            : "none generated"}
         </span>
-        <button className="linkbtn linkbtn--muted" type="button">
-          regenerate
-        </button>
+        <span className="row__meta">-</span>
       </div>
     </div>
   );
