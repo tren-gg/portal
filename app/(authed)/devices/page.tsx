@@ -136,15 +136,40 @@ export default async function DevicesPage({
                         rename
                       </button>
                     </form>
-                    <form action={revokeDeviceAction}>
-                      <input type="hidden" name="id" value={d.id} />
-                      <button className="linkbtn linkbtn--muted" type="submit">
+                    <details className="confirm-action">
+                      <summary className="linkbtn linkbtn--muted">
                         release seat
-                      </button>
-                    </form>
+                      </summary>
+                      <form action={revokeDeviceAction} className="confirm-action__body">
+                        <input type="hidden" name="id" value={d.id} />
+                        <p>Release this HWID from your account?</p>
+                        <button className="linkbtn" type="submit">
+                          confirm release
+                        </button>
+                      </form>
+                    </details>
                   </div>
                 </div>
               ))}
+
+              {activeDevices.length === 0 && limit === 0 && (
+                <div className="row">
+                  <div className="row__main">
+                    <div className="row__title" style={{ color: "var(--ink-500)" }}>
+                      No seats available
+                    </div>
+                    <div className="row__meta">
+                      <span>subscribe before authorizing a device</span>
+                    </div>
+                  </div>
+                  <div className="row__right">
+                    <span className="tag tag--off">
+                      <span className="dot" />
+                      inactive
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {Array.from({ length: Math.max(0, limit - activeDevices.length) }).map(
                 (_, i) => (
