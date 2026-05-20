@@ -1,10 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { exchangeCode } from "@/lib/api/auth";
-import { getMe } from "@/lib/api/me";
+import type { MeResponse } from "@/lib/api/types";
 import { env } from "@/lib/env";
 import { getSafeNextPath, getSafePlan } from "@/lib/redirects";
 import { getPkceSession, getSession } from "@/lib/session";
+
+async function getMeWithAccessToken(accessToken: string): Promise<MeResponse> {
+  const res = await fetch(`${env.API_URL}/v1/me`, {
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      "content-type": "application/json",
+    },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error(`Profile lookup failed with ${res.status}`);
+  }
+
+  return res.json();
+}
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
@@ -31,8 +47,10 @@ export async function GET(request: NextRequest) {
   pkce.destroy();
 
   let tokens;
+  let me;
   try {
     tokens = await exchangeCode(code, verifier);
+    me = await getMeWithAccessToken(tokens.access_token);
   } catch {
     return NextResponse.redirect(
       new URL("/auth/sign-in?error=Sign-in+failed.+Please+try+again.", env.APP_URL),
@@ -44,16 +62,8 @@ export async function GET(request: NextRequest) {
   session.refreshToken = tokens.refresh_token;
   session.accessExpiresAt = tokens.access_expires_at;
   session.refreshExpiresAt = tokens.refresh_expires_at;
-
-  try {
-    const me = await getMe();
-    session.userId = me.user.id;
-    session.email = me.user.email;
-  } catch {
-    session.userId = "";
-    session.email = "";
-  }
-
+  session.userId = me.user.id;
+  session.email = me.user.email;
   await session.save();
 
   if (next === "/subscribe" && plan) {
