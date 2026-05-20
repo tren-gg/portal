@@ -8,7 +8,6 @@ export type DevAccount = {
   createdAt: string;
   subscription: Subscription | null;
   devices: Device[];
-  isAdmin: boolean;
 };
 
 export const DEV_ACCOUNTS: DevAccount[] = [
@@ -16,9 +15,8 @@ export const DEV_ACCOUNTS: DevAccount[] = [
     id: "dev-user-1",
     label: "Default User",
     description: "Active subscription, 2 devices",
-    email: "user@tren.gg",
+    email: "user@example.com",
     createdAt: "2025-01-15T00:00:00.000Z",
-    isAdmin: false,
     subscription: {
       id: "sub-1",
       userId: "dev-user-1",
@@ -51,59 +49,11 @@ export const DEV_ACCOUNTS: DevAccount[] = [
     ],
   },
   {
-    id: "dev-admin-1",
-    label: "Admin",
-    description: "Active subscription, 3 devices, admin access",
-    email: "admin@tren.gg",
-    createdAt: "2024-10-01T00:00:00.000Z",
-    isAdmin: true,
-    subscription: {
-      id: "sub-2",
-      userId: "dev-admin-1",
-      status: "active",
-      plan: "yearly",
-      currentPeriodEnd: new Date(Date.now() + 300 * 86400000).toISOString(),
-      deviceLimit: 5,
-      source: "manual",
-      updatedAt: new Date().toISOString(),
-    },
-    devices: [
-      {
-        id: "dev-3",
-        userId: "dev-admin-1",
-        deviceId: "TOWER-Q1W2E3",
-        deviceName: "Dev Rig",
-        activatedAt: "2024-11-01T00:00:00.000Z",
-        lastSeenAt: new Date(Date.now() - 600000).toISOString(),
-        revokedAt: null,
-      },
-      {
-        id: "dev-4",
-        userId: "dev-admin-1",
-        deviceId: "LAPTOP-R4T5Y6",
-        deviceName: "Work Laptop",
-        activatedAt: "2024-12-15T00:00:00.000Z",
-        lastSeenAt: new Date(Date.now() - 7200000).toISOString(),
-        revokedAt: null,
-      },
-      {
-        id: "dev-5",
-        userId: "dev-admin-1",
-        deviceId: "MINI-U7I8O9",
-        deviceName: "Living Room PC",
-        activatedAt: "2025-01-20T00:00:00.000Z",
-        lastSeenAt: new Date(Date.now() - 172800000).toISOString(),
-        revokedAt: null,
-      },
-    ],
-  },
-  {
     id: "dev-user-2",
     label: "Free User",
     description: "No subscription, no devices",
-    email: "free@tren.gg",
+    email: "free@example.com",
     createdAt: "2025-04-01T00:00:00.000Z",
-    isAdmin: false,
     subscription: null,
     devices: [],
   },
@@ -111,9 +61,8 @@ export const DEV_ACCOUNTS: DevAccount[] = [
     id: "dev-user-3",
     label: "Past Due",
     description: "Past due subscription",
-    email: "pastdue@tren.gg",
+    email: "pastdue@example.com",
     createdAt: "2025-01-01T00:00:00.000Z",
-    isAdmin: false,
     subscription: {
       id: "sub-3",
       userId: "dev-user-3",

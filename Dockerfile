@@ -3,7 +3,7 @@ FROM node:22-alpine AS base
 FROM base AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm install --frozen-lockfile || npm install
+RUN npm ci
 
 FROM base AS builder
 WORKDIR /app
@@ -15,10 +15,10 @@ ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV IRON_SESSION_PASSWORD=build-time-placeholder-must-be-32-chars
 ENV IRON_SESSION_COOKIE_NAME=tren_portal_session
-ENV TREN_API_URL=http://localhost:3001
+ENV TREN_API_URL=https://api.tren.gg
 ENV TREN_API_CLIENT_ID=tren-portal
 ENV MARKETING_URL=https://tren.gg
-ENV DEV_MODE=true
+ENV DEV_MODE=false
 
 RUN npm run build
 
