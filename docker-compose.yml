@@ -1,0 +1,16 @@
+services:
+  portal:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_APP_URL: http://localhost:3000
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+      - MARKETING_URL=https://tren.gg
+      - TREN_API_URL=http://host.docker.internal:3001
+      - TREN_API_CLIENT_ID=tren-portal
+      - IRON_SESSION_PASSWORD=dev-password-must-be-at-least-32-characters-long
+      - IRON_SESSION_COOKIE_NAME=tren_portal_session
+      - DEV_MODE=true
