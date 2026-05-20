@@ -6,7 +6,7 @@ import { startEmailFlow } from "@/lib/api/auth";
 import { env } from "@/lib/env";
 import { generateVerifier, deriveChallenge, generateState } from "@/lib/pkce";
 import { getSafeNextPath, getSafePlan } from "@/lib/redirects";
-import { getPkceSession, getSession } from "@/lib/session";
+import { getPkceSession, getSession, hasCompleteSession, type SessionData } from "@/lib/session";
 import { DEV_ACCOUNTS } from "@/lib/dev-data";
 
 export default async function SignInPage({
@@ -15,8 +15,14 @@ export default async function SignInPage({
   searchParams: Promise<{ plan?: string; next?: string; error?: string }>;
 }) {
   const session = await getSession();
-  if (session.accessToken) {
+  const sessionData: Partial<SessionData> = session;
+
+  if (hasCompleteSession(sessionData)) {
     redirect("/dashboard");
+  }
+
+  if (sessionData.accessToken) {
+    redirect("/auth/reset");
   }
 
   const params = await searchParams;
