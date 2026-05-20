@@ -152,5 +152,6 @@ export function devMeResponse(account: DevAccount): MeResponse {
     clientId: "tren-portal",
     scope: "openid profile email",
     accessExpiresAt: new Date(Date.now() + 900000).toISOString(),
+    subscription: account.subscription,
   };
 }

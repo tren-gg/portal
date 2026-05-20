@@ -49,6 +49,7 @@ export type MeResponse = {
   clientId: string;
   scope: string;
   accessExpiresAt: string;
+  subscription: Subscription | null;
 };
 
 export type SubscriptionStatus = "active" | "trialing" | "past_due" | "canceled";
@@ -75,7 +76,26 @@ export type Device = {
 };
 
 export type ApiErrorBody = {
-  error: string;
-  message: string;
-  details?: Record<string, string[]>;
+  error: {
+    code: string;
+    message: string;
+    details?: Record<string, string[]>;
+  };
+};
+
+export type DevicesResponse = {
+  devices: Device[];
+};
+
+export type DeviceResponse = {
+  device: Device;
+};
+
+export type SubscriptionResponse = {
+  subscription: Subscription | null;
+};
+
+export type DownloadUrlResponse = {
+  url: string;
+  expiresAt: string;
 };

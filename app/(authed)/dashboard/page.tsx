@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 import { ScreenHead } from "@/components/screen-head";
+import { getDevices, getSubscription } from "@/lib/api/account";
 import { getMe } from "@/lib/api/me";
-import { getSubscription, getDevices } from "@/lib/api/dev-helpers";
 
 export default async function DashboardPage() {
   const [me, subscription, devices] = await Promise.all([
@@ -35,7 +35,7 @@ export default async function DashboardPage() {
         }
         cta={
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 8 }}>
-            <Link href="/configs" className="btn btn--primary-dark">
+            <Link href="/download" className="btn btn--primary-dark">
               Download loader
             </Link>
             <Link href="/devices" className="btn btn--ghost-dark">
