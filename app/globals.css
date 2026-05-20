@@ -371,6 +371,11 @@
   border-bottom: 1px solid var(--hairline-on-light);
 }
 
+.rowlist--nested {
+  border-bottom: 0;
+  margin-top: 8px;
+}
+
 .row {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -643,6 +648,14 @@
 
 .form-row__val--muted {
   color: var(--ink-500);
+}
+
+.form-row__val--danger {
+  color: #a51f1f;
+}
+
+.form-row--actions {
+  grid-template-columns: 200px max-content 1fr;
 }
 
 /* ============================================================

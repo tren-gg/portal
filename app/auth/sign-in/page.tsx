@@ -2,7 +2,12 @@ import { redirect } from "next/navigation";
 
 import { SignInForm } from "@/components/sign-in-form";
 import { DevAccountPicker } from "@/components/dev-account-picker";
-import { startEmailFlow } from "@/lib/api/auth";
+import {
+  exchangeCode,
+  registerWithPassword,
+  signInWithPassword,
+  startEmailFlow,
+} from "@/lib/api/auth";
 import { env } from "@/lib/env";
 import { generateVerifier, deriveChallenge, generateState } from "@/lib/pkce";
 import { getSafeNextPath, getSafePlan } from "@/lib/redirects";
@@ -36,6 +41,8 @@ export default async function SignInPage({
     "use server";
 
     const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const intent = (formData.get("intent") as string | null) ?? "magic";
     if (!email) {
       redirect(`/auth/sign-in?error=${encodeURIComponent("Email is required.")}`);
     }
@@ -50,6 +57,42 @@ export default async function SignInPage({
     pkce.next = next;
     pkce.plan = plan;
     await pkce.save();
+
+    if (intent === "password" || intent === "register") {
+      if (!password || password.length < 8) {
+        redirect(`/auth/sign-in?error=${encodeURIComponent("Password must be at least 8 characters.")}`);
+      }
+
+      if (intent === "register") {
+        try {
+          await registerWithPassword(email, password, { codeChallenge: challenge, state });
+        } catch (e) {
+          const message = e instanceof Error ? e.message : "Something went wrong.";
+          redirect(`/auth/sign-in?error=${encodeURIComponent(message)}`);
+        }
+
+        redirect(`/auth/check-email?email=${encodeURIComponent(email)}`);
+      }
+
+      try {
+        const authorized = await signInWithPassword(email, password, { codeChallenge: challenge, state });
+        const tokens = await exchangeCode(authorized.code, verifier);
+        const session = await getSession();
+        session.accessToken = tokens.access_token;
+        session.refreshToken = tokens.refresh_token;
+        session.accessExpiresAt = tokens.access_expires_at;
+        session.refreshExpiresAt = tokens.refresh_expires_at;
+        await session.save();
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Something went wrong.";
+        redirect(`/auth/sign-in?error=${encodeURIComponent(message)}`);
+      }
+
+      if (next === "/subscribe" && plan) {
+        redirect(`/subscribe?plan=${encodeURIComponent(plan)}`);
+      }
+      redirect(next ?? "/dashboard");
+    }
 
     try {
       await startEmailFlow(email, { codeChallenge: challenge, state });

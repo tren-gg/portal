@@ -16,6 +16,10 @@ export type EmailStartResponse = {
   devConfirmUrl?: string;
 };
 
+export type PasswordAuthorizeResponse = {
+  code: string;
+};
+
 export type TokenRequest =
   | {
       grant_type: "authorization_code";
@@ -49,6 +53,15 @@ export type MeResponse = {
   clientId: string;
   scope: string;
   accessExpiresAt: string;
+  account: {
+    auth: {
+      method: "magic_link" | "password_or_magic_link";
+      hasPassword: boolean;
+      twoFactorEnabled: boolean;
+      recoveryCodesAvailable: boolean;
+      recoveryCodesRemaining: number;
+    };
+  };
   subscription: Subscription | null;
 };
 

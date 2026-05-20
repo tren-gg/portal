@@ -1,5 +1,10 @@
 import { env } from "@/lib/env";
-import type { EmailStartRequest, EmailStartResponse, TokenResponse } from "./types";
+import type {
+  EmailStartRequest,
+  EmailStartResponse,
+  PasswordAuthorizeResponse,
+  TokenResponse,
+} from "./types";
 
 export async function startEmailFlow(email: string, params: {
   codeChallenge: string;
@@ -29,6 +34,49 @@ export async function startEmailFlow(email: string, params: {
   }
 
   return res.json();
+}
+
+async function passwordAuthorize<T>(path: string, email: string, password: string, params: {
+  codeChallenge: string;
+  state: string;
+}): Promise<T> {
+  const res = await fetch(`${env.API_URL}${path}`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      response_type: "code",
+      client_id: env.CLIENT_ID,
+      redirect_uri: `${env.APP_URL}/auth/callback`,
+      code_challenge: params.codeChallenge,
+      code_challenge_method: "S256",
+      state: params.state,
+      scope: "openid profile email",
+      email,
+      password,
+    }),
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.error?.message ?? `Password authorization failed with ${res.status}`);
+  }
+
+  return res.json();
+}
+
+export async function signInWithPassword(email: string, password: string, params: {
+  codeChallenge: string;
+  state: string;
+}) {
+  return passwordAuthorize<PasswordAuthorizeResponse>("/oauth/password/sign-in", email, password, params);
+}
+
+export async function registerWithPassword(email: string, password: string, params: {
+  codeChallenge: string;
+  state: string;
+}): Promise<EmailStartResponse> {
+  return passwordAuthorize<EmailStartResponse>("/oauth/password/register", email, password, params);
 }
 
 export async function exchangeCode(code: string, codeVerifier: string): Promise<TokenResponse> {
