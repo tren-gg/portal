@@ -101,6 +101,15 @@ export function devMeResponse(account: DevAccount): MeResponse {
     clientId: "tren-portal",
     scope: "openid profile email",
     accessExpiresAt: new Date(Date.now() + 900000).toISOString(),
+    account: {
+      auth: {
+        method: "password_or_magic_link",
+        hasPassword: true,
+        twoFactorEnabled: false,
+        recoveryCodesAvailable: false,
+        recoveryCodesRemaining: 0,
+      },
+    },
     subscription: account.subscription,
   };
 }

@@ -57,3 +57,13 @@ export async function createDownloadUrl(): Promise<DownloadUrlResponse> {
     body: JSON.stringify({}),
   });
 }
+
+export async function updatePassword(input: {
+  currentPassword?: string;
+  newPassword: string;
+}) {
+  return apiFetch<{ hasPassword: true }>("/v1/me/password", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}

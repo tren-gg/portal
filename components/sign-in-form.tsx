@@ -11,8 +11,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" className="h-[46px] w-full font-semibold" disabled={pending}>
-      {pending ? "Sending link..." : "Continue"}
+    <Button
+      type="submit"
+      name="intent"
+      value="magic"
+      className="h-[46px] w-full font-semibold"
+      disabled={pending}
+    >
+      {pending ? "Working..." : "Send sign-in link"}
     </Button>
   );
 }
@@ -29,8 +35,14 @@ export function SignInForm({
   async function handleAction(formData: FormData) {
     setClientError(null);
     const email = formData.get("email") as string;
+    const intent = formData.get("intent") as string;
+    const password = formData.get("password") as string;
     if (!email || !email.includes("@")) {
       setClientError("Please enter a valid email address.");
+      return;
+    }
+    if (intent !== "magic" && (!password || password.length < 8)) {
+      setClientError("Password must be at least 8 characters.");
       return;
     }
     await action(formData);
@@ -40,7 +52,7 @@ export function SignInForm({
     <form action={handleAction} className="grid w-full max-w-[420px] gap-4">
       <h1 className="text-3xl font-semibold tracking-tight">Sign in to Tren</h1>
       <p className="text-muted-foreground leading-relaxed">
-        Enter your email. We&apos;ll send a one-time sign-in link.
+        Use your password or request a one-time email link.
       </p>
 
       {(error || clientError) && (
@@ -61,6 +73,38 @@ export function SignInForm({
           placeholder="you@example.com"
         />
       </Label>
+
+      <Label className="grid gap-2 text-sm text-[#d9d9df]">
+        Password
+        <Input
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          minLength={8}
+          className="h-[46px] border-border bg-card"
+          placeholder="8+ characters"
+        />
+      </Label>
+
+      <div className="grid gap-2">
+        <Button
+          type="submit"
+          name="intent"
+          value="password"
+          className="h-[46px] w-full font-semibold"
+        >
+          Sign in
+        </Button>
+        <Button
+          type="submit"
+          name="intent"
+          value="register"
+          variant="outline"
+          className="h-[46px] w-full font-semibold"
+        >
+          Create account
+        </Button>
+      </div>
 
       <SubmitButton />
     </form>

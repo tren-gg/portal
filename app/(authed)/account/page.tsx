@@ -1,9 +1,46 @@
+import { redirect } from "next/navigation";
+
 import { ScreenHead } from "@/components/screen-head";
 import { TwoFactorToggle } from "@/components/security-form";
+import { updatePassword } from "@/lib/api/account";
 import { getMe } from "@/lib/api/me";
 
-export default async function AccountPage() {
+export default async function AccountPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ passwordStatus?: string; passwordError?: string }>;
+}) {
+  const params = await searchParams;
   const me = await getMe();
+  const hasPassword = me.account.auth.hasPassword;
+
+  async function handlePasswordUpdate(formData: FormData) {
+    "use server";
+
+    const currentPassword = formData.get("currentPassword") as string;
+    const newPassword = formData.get("newPassword") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (!newPassword || newPassword.length < 8) {
+      redirect("/account?passwordError=Password+must+be+at+least+8+characters.");
+    }
+
+    if (newPassword !== confirmPassword) {
+      redirect("/account?passwordError=Password+confirmation+does+not+match.");
+    }
+
+    try {
+      await updatePassword({
+        currentPassword: currentPassword || undefined,
+        newPassword,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not update password.";
+      redirect(`/account?passwordError=${encodeURIComponent(message)}`);
+    }
+
+    redirect("/account?passwordStatus=Password+updated.");
+  }
 
   return (
     <>
@@ -38,12 +75,66 @@ export default async function AccountPage() {
               <div className="form-row">
                 <span className="form-row__label">password</span>
                 <span className="form-row__val form-row__val--muted">
-                  set at account creation
+                  {hasPassword ? "enabled" : "not set"}
                 </span>
-                <button className="linkbtn linkbtn--muted" type="button">
-                  change
-                </button>
               </div>
+              {(params.passwordStatus || params.passwordError) && (
+                <div className="form-row">
+                  <span className="form-row__label">status</span>
+                  <span
+                    className={
+                      params.passwordError
+                        ? "form-row__val form-row__val--danger"
+                        : "form-row__val"
+                    }
+                  >
+                    {params.passwordError ?? params.passwordStatus}
+                  </span>
+                </div>
+              )}
+              <form action={handlePasswordUpdate} className="rowlist rowlist--nested">
+                {hasPassword && (
+                  <label className="form-row">
+                    <span className="form-row__label">current</span>
+                    <input
+                      className="portal-input"
+                      name="currentPassword"
+                      type="password"
+                      autoComplete="current-password"
+                      minLength={8}
+                      required
+                    />
+                  </label>
+                )}
+                <label className="form-row">
+                  <span className="form-row__label">new</span>
+                  <input
+                    className="portal-input"
+                    name="newPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    minLength={8}
+                    required
+                  />
+                </label>
+                <label className="form-row">
+                  <span className="form-row__label">confirm</span>
+                  <input
+                    className="portal-input"
+                    name="confirmPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    minLength={8}
+                    required
+                  />
+                </label>
+                <div className="form-row form-row--actions">
+                  <span className="form-row__label" />
+                  <button className="linkbtn" type="submit">
+                    {hasPassword ? "change password" : "set password"}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
