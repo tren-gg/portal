@@ -24,6 +24,7 @@ Set these in the deployment platform's dashboard:
 | `TREN_API_CLIENT_ID` | `tren-portal` | Must match the registered OAuth client |
 | `IRON_SESSION_PASSWORD` | (random 32+ char string) | Used to encrypt session cookies |
 | `IRON_SESSION_COOKIE_NAME` | `tren_portal_session` | Cookie name |
+| `DEV_MODE` | `false` | Development fixtures are disabled automatically when `NODE_ENV=production` |
 
 Generate the session password:
 

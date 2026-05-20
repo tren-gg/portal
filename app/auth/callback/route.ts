@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { exchangeCode } from "@/lib/api/auth";
 import { getMe } from "@/lib/api/me";
 import { env } from "@/lib/env";
+import { getSafeNextPath, getSafePlan } from "@/lib/redirects";
 import { getPkceSession, getSession } from "@/lib/session";
 
 export async function GET(request: NextRequest) {
@@ -25,8 +26,8 @@ export async function GET(request: NextRequest) {
   }
 
   const verifier = pkce.verifier;
-  const next = pkce.next;
-  const plan = pkce.plan;
+  const next = getSafeNextPath(pkce.next);
+  const plan = getSafePlan(pkce.plan);
   pkce.destroy();
 
   let tokens;

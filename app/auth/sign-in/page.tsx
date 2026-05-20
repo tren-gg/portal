@@ -5,6 +5,7 @@ import { DevAccountPicker } from "@/components/dev-account-picker";
 import { startEmailFlow } from "@/lib/api/auth";
 import { env } from "@/lib/env";
 import { generateVerifier, deriveChallenge, generateState } from "@/lib/pkce";
+import { getSafeNextPath, getSafePlan } from "@/lib/redirects";
 import { getPkceSession, getSession } from "@/lib/session";
 import { DEV_ACCOUNTS } from "@/lib/dev-data";
 
@@ -35,8 +36,8 @@ export default async function SignInPage({
     const pkce = await getPkceSession();
     pkce.verifier = verifier;
     pkce.state = state;
-    pkce.next = params.next ?? null;
-    pkce.plan = params.plan ?? null;
+    pkce.next = getSafeNextPath(params.next);
+    pkce.plan = getSafePlan(params.plan);
     await pkce.save();
 
     try {

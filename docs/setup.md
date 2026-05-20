@@ -24,6 +24,7 @@ TREN_API_URL=http://localhost:3001
 TREN_API_CLIENT_ID=tren-portal
 IRON_SESSION_PASSWORD=<random 32+ character string>
 IRON_SESSION_COOKIE_NAME=tren_portal_session
+DEV_MODE=true
 ```
 
 Generate a session password:
