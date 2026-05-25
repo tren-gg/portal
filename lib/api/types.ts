@@ -74,8 +74,12 @@ export type Subscription = {
   plan: string;
   currentPeriodEnd: string | null;
   deviceLimit: number;
-  source: "manual" | "stripe";
+  source: "manual" | "stripe" | "plisio" | "rexdigital" | "reseller";
   updatedAt: string;
+  reseller?: {
+    displayName: string;
+    verificationUrl: string;
+  };
 };
 
 export type Device = {

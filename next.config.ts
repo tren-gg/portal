@@ -2,7 +2,12 @@ import type { NextConfig } from "next";
 
 const isProduction = process.env.NODE_ENV === "production";
 const scriptSources = ["'self'", "'unsafe-inline'", ...(!isProduction ? ["'unsafe-eval'"] : [])];
-const connectSources = ["'self'", "https://api.tren.gg", ...(!isProduction ? ["http://localhost:3001"] : [])];
+const connectSources = [
+  "'self'",
+  "https://api.tren.gg",
+  "https://api.examination.tren.gg",
+  ...(!isProduction ? ["http://localhost:3001"] : []),
+];
 
 const contentSecurityPolicy = [
   "default-src 'self'",
