@@ -2,7 +2,9 @@
 
 ## Platform
 
-Deploy to Render or Vercel. Both auto-manage TLS once the custom domain is verified.
+Deploy to Railway, Render, or Vercel. Each auto-manages TLS once the custom domain is verified.
+
+Railway should use the checked-in `railway.json`, which points at the production Dockerfile. Do not override the start command in Railway; the Dockerfile runs the standalone Next.js server with `node server.js`.
 
 ## Custom domain
 
