@@ -25,6 +25,12 @@ export const env = {
     }
     return process.env.TREN_API_URL ?? "http://localhost:3001";
   },
+  get JANUS_URL() {
+    if (process.env.NODE_ENV === "production") {
+      return requireEnv("TREN_JANUS_URL");
+    }
+    return process.env.TREN_JANUS_URL ?? "http://localhost:3002";
+  },
   get CLIENT_ID() {
     return process.env.TREN_API_CLIENT_ID ?? "tren-portal";
   },

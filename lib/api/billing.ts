@@ -1,14 +1,14 @@
-import { apiFetch } from "./client";
+import { janusFetch } from "./client";
 
 export async function createCheckout(plan: string): Promise<{ url: string }> {
-  return apiFetch<{ url: string }>("/v1/billing/checkout", {
+  return janusFetch<{ url: string }>("/v1/checkout/session", {
     method: "POST",
-    body: JSON.stringify({ plan }),
+    body: JSON.stringify({ product_sku: plan, provider: "stripe" }),
   });
 }
 
 export async function createPortalSession(): Promise<{ url: string }> {
-  return apiFetch<{ url: string }>("/v1/billing/portal", {
+  return janusFetch<{ url: string }>("/v1/portal/session", {
     method: "POST",
     body: JSON.stringify({}),
   });

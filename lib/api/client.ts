@@ -55,10 +55,7 @@ function isTokenExpiringSoon(expiresAt: string): boolean {
   return new Date(expiresAt).getTime() - Date.now() < 60_000;
 }
 
-export async function apiFetch<T>(
-  path: string,
-  init?: RequestInit,
-): Promise<T> {
+async function fetchAt<T>(baseUrl: string, path: string, init?: RequestInit): Promise<T> {
   const session = await getSession();
   const hasSession = !!session.accessToken;
 
@@ -74,7 +71,7 @@ export async function apiFetch<T>(
   }
   headers.set("content-type", "application/json");
 
-  let res = await fetch(`${env.API_URL}${path}`, {
+  let res = await fetch(`${baseUrl}${path}`, {
     ...init,
     headers,
     cache: "no-store",
@@ -88,7 +85,7 @@ export async function apiFetch<T>(
       retryHeaders.set("authorization", `Bearer ${retrySession.accessToken}`);
       retryHeaders.set("content-type", "application/json");
 
-      res = await fetch(`${env.API_URL}${path}`, {
+      res = await fetch(`${baseUrl}${path}`, {
         ...init,
         headers: retryHeaders,
         cache: "no-store",
@@ -104,4 +101,12 @@ export async function apiFetch<T>(
   const text = await res.text();
   if (!text) return undefined as T;
   return JSON.parse(text) as T;
+}
+
+export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  return fetchAt<T>(env.API_URL, path, init);
+}
+
+export async function janusFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  return fetchAt<T>(env.JANUS_URL, path, init);
 }
