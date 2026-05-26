@@ -1,12 +1,13 @@
 import { env } from "@/lib/env";
 import { getDevAccount } from "@/lib/dev-data";
 import { getSession } from "@/lib/session";
-import { apiFetch } from "./client";
+import { ApiError, apiFetch } from "./client";
 import type {
   Device,
   DeviceResponse,
   DevicesResponse,
   DownloadUrlResponse,
+  MeResponse,
   Subscription,
   SubscriptionResponse,
 } from "./types";
@@ -22,8 +23,16 @@ export async function getSubscription(): Promise<Subscription | null> {
   const devAccount = await getDevAccountForSession();
   if (devAccount) return devAccount.subscription;
 
-  const data = await apiFetch<SubscriptionResponse>("/v1/billing/subscription");
-  return data.subscription;
+  try {
+    const data = await apiFetch<SubscriptionResponse>("/v1/billing/subscription");
+    return data.subscription;
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      const me = await apiFetch<MeResponse>("/v1/me");
+      return me.subscription ?? null;
+    }
+    throw error;
+  }
 }
 
 export async function getDevices(): Promise<Device[]> {
