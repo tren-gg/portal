@@ -94,14 +94,18 @@ export default async function SignInPage({
       redirect(next ?? "/dashboard");
     }
 
+    let devConfirmUrl: string | undefined;
     try {
-      await startEmailFlow(email, { codeChallenge: challenge, state });
+      const result = await startEmailFlow(email, { codeChallenge: challenge, state });
+      devConfirmUrl = result.devConfirmUrl;
     } catch (e) {
       const message = e instanceof Error ? e.message : "Something went wrong.";
       redirect(`/auth/sign-in?error=${encodeURIComponent(message)}`);
     }
 
-    redirect(`/auth/check-email?email=${encodeURIComponent(email)}`);
+    const params = new URLSearchParams({ email });
+    if (devConfirmUrl) params.set("devConfirmUrl", devConfirmUrl);
+    redirect(`/auth/check-email?${params.toString()}`);
   }
 
   async function handleDevSignIn(formData: FormData) {

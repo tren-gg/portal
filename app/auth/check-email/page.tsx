@@ -3,10 +3,11 @@ import Link from "next/link";
 export default async function CheckEmailPage({
   searchParams,
 }: {
-  searchParams: Promise<{ email?: string }>;
+  searchParams: Promise<{ email?: string; devConfirmUrl?: string }>;
 }) {
   const params = await searchParams;
   const email = params.email ?? "your email";
+  const devConfirmUrl = params.devConfirmUrl;
 
   return (
     <main className="grid min-h-dvh place-items-center p-6">
@@ -17,6 +18,22 @@ export default async function CheckEmailPage({
           <strong className="text-foreground">{email}</strong>.
           Click the link in that email to continue.
         </p>
+        {devConfirmUrl ? (
+          <div className="grid gap-2 rounded-md border border-dashed border-foreground/40 p-4">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              Examination environment
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Email delivery is disabled in this environment. Use the dev link below to sign in.
+            </p>
+            <a
+              href={devConfirmUrl}
+              className="inline-flex items-center justify-center rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90 transition-opacity"
+            >
+              Sign in (examination)
+            </a>
+          </div>
+        ) : null}
         <p className="text-sm text-muted-foreground">
           Didn&apos;t receive it?{" "}
           <Link
