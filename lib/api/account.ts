@@ -8,6 +8,9 @@ import type {
   DevicesResponse,
   DownloadUrlResponse,
   MeResponse,
+  SavedConfigDetails,
+  SavedConfigResponse,
+  SavedConfigsResponse,
   Subscription,
   SubscriptionResponse,
 } from "./types";
@@ -41,6 +44,39 @@ export async function getDevices(): Promise<Device[]> {
 
   const data = await apiFetch<DevicesResponse>("/v1/me/devices");
   return data.devices;
+}
+
+export async function getSavedConfigs() {
+  const devAccount = await getDevAccountForSession();
+  if (env.DEV_MODE) return devAccount?.configs ?? [];
+
+  const data = await apiFetch<SavedConfigsResponse>("/v1/me/configs");
+  return data.configs;
+}
+
+export async function getSavedConfig(id: string): Promise<SavedConfigDetails> {
+  const devAccount = await getDevAccountForSession();
+  if (env.DEV_MODE) {
+    const config = devAccount?.configs.find((c) => c.id === id);
+    if (config) return { ...config, payload: "" };
+    throw new ApiError(404, {
+      error: {
+        code: "not_found",
+        message: "Saved config not found.",
+      },
+    });
+  }
+
+  const data = await apiFetch<SavedConfigResponse>(`/v1/me/configs/${encodeURIComponent(id)}`);
+  return data.config;
+}
+
+export async function deleteSavedConfig(id: string): Promise<void> {
+  if (env.DEV_MODE) return;
+
+  await apiFetch<void>(`/v1/me/configs/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
 }
 
 export async function renameDevice(id: string, deviceName: string): Promise<Device> {

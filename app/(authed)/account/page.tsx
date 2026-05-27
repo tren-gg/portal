@@ -182,6 +182,24 @@ export default async function AccountPage({
             </div>
           </div>
         </div>
+
+        <div className="dark-block">
+          <div className="group__l">
+            <h2 className="group__title">Delete account</h2>
+            <p className="group__caption">
+              Closes your subscription, releases all seats, and wipes saved
+              configs. Can&apos;t be undone after 14 days.
+            </p>
+          </div>
+          <div
+            className="group__r"
+            style={{ alignItems: "flex-start", justifyContent: "flex-start" }}
+          >
+            <button className="btn btn--ghost-dark" type="button">
+              Begin deletion
+            </button>
+          </div>
+        </div>
       </div>
     </>
   );

@@ -1,135 +1,155 @@
-"use client";
+import Link from "next/link";
 
-import { useState } from "react";
+import type { SavedConfig, SavedConfigDetails } from "@/lib/api/types";
 
-type Config = {
-  name: string;
-  mc: string;
-  modules: string;
-  size: string;
-  updated: string;
-  active?: boolean;
+type ConfigsListProps = {
+  configs: SavedConfig[];
+  selectedConfig: SavedConfigDetails | null;
+  deleteAction: (formData: FormData) => void | Promise<void>;
+  error?: string;
+  status?: string;
 };
 
-const MOCK_CONFIGS: Config[] = [
-  { name: "pvp-1.21.cfg", mc: "1.21.4", modules: "Combat, Visuals, Blink", size: "4.2 kb", updated: "2 hours ago", active: true },
-  { name: "anchor-rush.cfg", mc: "1.20.6", modules: "Combat, Movement", size: "3.8 kb", updated: "1 day ago" },
-  { name: "long-range.cfg", mc: "1.21.4", modules: "Combat, Visuals", size: "4.0 kb", updated: "3 days ago" },
-  { name: "potpvp.cfg", mc: "1.8.9", modules: "Combat", size: "2.9 kb", updated: "12 days ago" },
-  { name: "smp-passive.cfg", mc: "1.21.1", modules: "Visuals, Blink", size: "3.1 kb", updated: "21 days ago" },
-  { name: "test-killaura.cfg", mc: "1.21.4", modules: "Combat", size: "4.4 kb", updated: "1 month ago" },
-  { name: "default.cfg", mc: "1.21.4", modules: "all", size: "5.0 kb", updated: "3 months ago" },
-];
+function formatBytes(bytes: number) {
+  if (bytes < 1024) return `${bytes} b`;
+  return `${(bytes / 1024).toFixed(1)} kb`;
+}
 
-const PREVIEW = `# pvp-1.21.cfg
-# saved from tren 2.4.1 · minecraft 1.21.4
+function timeAgo(date: Date): string {
+  const seconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
 
-[combat.killaura]
-  range            = 4.2
-  fov              = 180
-  speed.horizontal = 11.5
-  speed.vertical   = 4.0
-  target           = multipoint
-  smoothing        = 0.18
+function modulesLabel(config: SavedConfig) {
+  return config.modules.length > 0 ? config.modules.join(", ") : "no module metadata";
+}
 
-[combat.criticals]
-  mode    = packet
-  jitter  = false
-
-[visuals.tracers]
-  enabled = true
-  alpha   = 0.6
-  color   = white
-
-[blink]
-  hold.max.ms = 3500
-  release.on  = key
-
-[loader]
-  inject.delay.ms = 250
-  hide.injection  = true`;
-
-export function ConfigsList() {
-  const [selected, setSelected] = useState<string | null>(null);
+export function ConfigsList({
+  configs,
+  selectedConfig,
+  deleteAction,
+  error,
+  status,
+}: ConfigsListProps) {
+  const totalBytes = configs.reduce((sum, config) => sum + config.sizeBytes, 0);
+  const lastWrite = configs[0]?.updatedAt ? timeAgo(new Date(configs[0].updatedAt)) : null;
 
   return (
     <>
+      {(error || status) && (
+        <div className="group">
+          <div className="group__l">
+            <h2 className="group__title">{error ? "Action failed" : "Updated"}</h2>
+          </div>
+          <div className="group__r">
+            <div className="rowlist">
+              <div className="row">
+                <div className="row__main">
+                  <div className="row__title">{error ?? status}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="group">
         <div className="group__l">
           <h2 className="group__title">Saved configs</h2>
           <p className="group__caption">
-            {MOCK_CONFIGS.length.toString().padStart(2, "0")} configs · 26.4 kb
-            total · last write 2 hours ago.
+            {configs.length.toString().padStart(2, "0")} configs
+            {configs.length > 0 ? ` · ${formatBytes(totalBytes)} total` : ""}
+            {lastWrite ? ` · last write ${lastWrite}.` : "."}
           </p>
         </div>
         <div className="group__r">
           <div className="rowlist">
-            {MOCK_CONFIGS.map((c) => (
-              <div
-                className="row"
-                key={c.name}
-                style={{
-                  cursor: "pointer",
-                  background:
-                    selected === c.name ? "var(--ink-50)" : "transparent",
-                  padding:
-                    selected === c.name ? "18px 16px" : "18px 0",
-                  margin: selected === c.name ? "0 -16px" : "0",
-                }}
-                onClick={() =>
-                  setSelected(selected === c.name ? null : c.name)
-                }
-              >
+            {configs.map((config) => {
+              const selected = selectedConfig?.id === config.id;
+
+              return (
+                <div
+                  className="row"
+                  key={config.id}
+                  style={{
+                    background: selected ? "var(--ink-50)" : "transparent",
+                    padding: selected ? "18px 16px" : "18px 0",
+                    margin: selected ? "0 -16px" : "0",
+                  }}
+                >
+                  <div className="row__main">
+                    <div className="row__title">
+                      <Link href={`/configs?selected=${encodeURIComponent(config.id)}`} className="row__link">
+                        {config.name}
+                      </Link>
+                    </div>
+                    <div className="row__meta">
+                      <span>minecraft {config.minecraftVersion ?? "unknown"}</span>
+                      <span>{modulesLabel(config)}</span>
+                      <span>{formatBytes(config.sizeBytes)}</span>
+                      <span>{timeAgo(new Date(config.updatedAt))}</span>
+                    </div>
+                  </div>
+                  <div className="row__right">
+                    <Link
+                      href={`/configs/${encodeURIComponent(config.id)}/download`}
+                      className="linkbtn linkbtn--muted"
+                    >
+                      download
+                    </Link>
+                    <details className="confirm-action">
+                      <summary className="linkbtn linkbtn--muted">delete</summary>
+                      <form action={deleteAction} className="confirm-action__body">
+                        <input type="hidden" name="id" value={config.id} />
+                        <p>Delete this saved config from your account?</p>
+                        <button className="linkbtn" type="submit">
+                          confirm delete
+                        </button>
+                      </form>
+                    </details>
+                  </div>
+                </div>
+              );
+            })}
+
+            {configs.length === 0 && (
+              <div className="row">
                 <div className="row__main">
-                  <div className="row__title">
-                    {c.name}
-                    {c.active ? (
-                      <span className="tag tag--active">
-                        <span className="dot" />
-                        loaded
-                      </span>
-                    ) : null}
+                  <div className="row__title" style={{ color: "var(--ink-500)" }}>
+                    No saved configs
                   </div>
                   <div className="row__meta">
-                    <span>minecraft {c.mc}</span>
-                    <span>{c.modules}</span>
-                    <span>{c.size}</span>
-                    <span>{c.updated}</span>
+                    <span>save a config in the loader and it will sync here</span>
                   </div>
                 </div>
                 <div className="row__right">
-                  <button
-                    className="linkbtn linkbtn--muted"
-                    type="button"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    download
-                  </button>
-                  <button
-                    className="linkbtn linkbtn--muted"
-                    type="button"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    delete
-                  </button>
+                  <span className="tag tag--off">
+                    <span className="dot" />
+                    empty
+                  </span>
                 </div>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
 
-      {selected && (
+      {selectedConfig && (
         <div className="group">
           <div className="group__l">
             <h2 className="group__title">Preview</h2>
             <p className="group__caption">
-              Read-only here — edit values inside the loader, not from the
-              browser.
+              This is the payload returned by the API for the selected config.
             </p>
           </div>
           <div className="group__r">
-            <div className="cfg-preview">{PREVIEW}</div>
+            <div className="cfg-preview">{selectedConfig.payload}</div>
           </div>
         </div>
       )}

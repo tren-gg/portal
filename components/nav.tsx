@@ -9,7 +9,6 @@ const tabs = [
   { key: "devices", label: "Devices", href: "/devices" },
   { key: "configs", label: "Configs", href: "/configs" },
   { key: "account", label: "Security", href: "/account" },
-  { key: "profile", label: "Profile", href: "/profile" },
 ];
 
 type NavProps = {

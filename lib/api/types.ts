@@ -92,6 +92,22 @@ export type Device = {
   revokedAt: string | null;
 };
 
+export type SavedConfig = {
+  id: string;
+  userId: string;
+  name: string;
+  minecraftVersion: string | null;
+  modules: string[];
+  sizeBytes: number;
+  checksumSha256: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type SavedConfigDetails = SavedConfig & {
+  payload: string;
+};
+
 export type ApiErrorBody = {
   error: {
     code: string;
@@ -106,6 +122,14 @@ export type DevicesResponse = {
 
 export type DeviceResponse = {
   device: Device;
+};
+
+export type SavedConfigsResponse = {
+  configs: SavedConfig[];
+};
+
+export type SavedConfigResponse = {
+  config: SavedConfigDetails;
 };
 
 export type SubscriptionResponse = {

@@ -17,7 +17,7 @@ export async function startEmailFlow(email: string, params: {
     code_challenge: params.codeChallenge,
     code_challenge_method: "S256",
     state: params.state,
-    scope: "openid profile email",
+    scope: "openid email",
     email,
   };
 
@@ -50,7 +50,7 @@ async function passwordAuthorize<T>(path: string, email: string, password: strin
       code_challenge: params.codeChallenge,
       code_challenge_method: "S256",
       state: params.state,
-      scope: "openid profile email",
+      scope: "openid email",
       email,
       password,
     }),

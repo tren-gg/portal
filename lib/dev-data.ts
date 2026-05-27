@@ -1,4 +1,4 @@
-import type { MeResponse, Device, Subscription } from "@/lib/api/types";
+import type { MeResponse, Device, SavedConfig, Subscription } from "@/lib/api/types";
 
 export type DevAccount = {
   id: string;
@@ -8,6 +8,7 @@ export type DevAccount = {
   createdAt: string;
   subscription: Subscription | null;
   devices: Device[];
+  configs: SavedConfig[];
 };
 
 export const DEV_ACCOUNTS: DevAccount[] = [
@@ -47,6 +48,7 @@ export const DEV_ACCOUNTS: DevAccount[] = [
         revokedAt: null,
       },
     ],
+    configs: [],
   },
   {
     id: "dev-user-2",
@@ -56,6 +58,7 @@ export const DEV_ACCOUNTS: DevAccount[] = [
     createdAt: "2025-04-01T00:00:00.000Z",
     subscription: null,
     devices: [],
+    configs: [],
   },
   {
     id: "dev-user-3",
@@ -84,6 +87,7 @@ export const DEV_ACCOUNTS: DevAccount[] = [
         revokedAt: null,
       },
     ],
+    configs: [],
   },
 ];
 
@@ -99,7 +103,7 @@ export function devMeResponse(account: DevAccount): MeResponse {
       createdAt: account.createdAt,
     },
     clientId: "tren-portal",
-    scope: "openid profile email",
+    scope: "openid email",
     accessExpiresAt: new Date(Date.now() + 900000).toISOString(),
     account: {
       auth: {

@@ -5,7 +5,6 @@ const allowedNextPaths = new Set([
   "/dashboard",
   "/devices",
   "/download",
-  "/profile",
   "/subscribe",
 ]);
 

@@ -176,13 +176,13 @@ export default async function DashboardPage() {
               </div>
               <div className="row">
                 <div className="row__main">
-                  <div className="row__title">Profile</div>
+                  <div className="row__title">Saved configs</div>
                   <div className="row__meta">
-                    <span>display name, email preferences</span>
+                    <span>synced configs, downloads, cleanup</span>
                   </div>
                 </div>
                 <div className="row__right">
-                  <Link href="/profile" className="linkbtn linkbtn--muted" style={{ borderColor: "var(--ink-700)", color: "var(--ink-300)" }}>
+                  <Link href="/configs" className="linkbtn linkbtn--muted" style={{ borderColor: "var(--ink-700)", color: "var(--ink-300)" }}>
                     open
                   </Link>
                 </div>
