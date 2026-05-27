@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { AuthShell } from "@/components/auth-shell";
 import { SignInForm } from "@/components/sign-in-form";
 import { DevAccountPicker } from "@/components/dev-account-picker";
 import {
@@ -130,34 +131,38 @@ export default async function SignInPage({
   }
 
   return (
-    <main className="grid min-h-dvh place-items-center p-6">
+    <AuthShell>
       {env.DEV_MODE ? (
-        <div className="grid w-full max-w-[420px] gap-6">
-          <div className="grid gap-2">
-            <h1 className="text-3xl font-semibold tracking-tight">Developer Mode</h1>
-            <p className="text-muted-foreground leading-relaxed">
-              Pick a test account to sign in instantly.
-            </p>
-          </div>
-          <DevAccountPicker action={handleDevSignIn} />
+        <div className="grid w-full max-w-[520px] gap-5">
+          <SignInForm action={handleSignIn} error={params.error} />
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
+              <span className="w-full border-t border-white/10" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">or use real auth</span>
+              <span className="bg-[#070708] px-3 text-[#8a8a92]">
+                or use real auth
+              </span>
             </div>
           </div>
-          <SignInForm action={handleSignIn} error={params.error} />
+          <section className="border border-white/10 bg-[#070708]/95 text-white shadow-[0_24px_90px_rgba(0,0,0,0.35)]">
+            <div className="flex items-center justify-between gap-5 border-b border-white/10 px-6 py-4">
+              <h2 className="text-xl font-medium tracking-[0]">Developer Mode</h2>
+              <span className="text-[10px] font-medium uppercase tracking-[0] text-[#8a8a92]">
+                Instant
+              </span>
+            </div>
+            <div className="grid gap-5 px-6 py-6">
+              <p className="text-sm leading-relaxed text-[#b8b8be]">
+                Pick a test account to sign in instantly.
+              </p>
+              <DevAccountPicker action={handleDevSignIn} />
+            </div>
+          </section>
         </div>
       ) : (
         <SignInForm action={handleSignIn} error={params.error} />
       )}
-      <footer className="fixed bottom-6 text-sm text-muted-foreground">
-        <a href={env.MARKETING_URL} className="hover:text-foreground transition-colors">
-          &larr; Back to tren.gg
-        </a>
-      </footer>
-    </main>
+    </AuthShell>
   );
 }

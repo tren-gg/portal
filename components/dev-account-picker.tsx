@@ -3,7 +3,6 @@
 import { useFormStatus } from "react-dom";
 
 import { DEV_ACCOUNTS } from "@/lib/dev-data";
-import { Card, CardContent } from "@/components/ui/card";
 
 function AccountButton({ accountId }: { accountId: string }) {
   const { pending } = useFormStatus();
@@ -15,17 +14,17 @@ function AccountButton({ accountId }: { accountId: string }) {
       name="accountId"
       value={account.id}
       disabled={pending}
-      className="w-full text-left"
+      className="w-full border border-white/10 bg-white/[0.03] px-4 py-3 text-left transition-colors hover:bg-white/[0.07] disabled:cursor-not-allowed disabled:opacity-60"
     >
-      <Card className="transition-colors hover:bg-accent/50 cursor-pointer">
-        <CardContent className="flex items-center justify-between py-3">
-          <div>
-            <p className="font-medium">{account.label}</p>
-            <p className="text-sm text-muted-foreground">{account.email}</p>
-          </div>
-          <span className="text-xs text-muted-foreground">{account.description}</span>
-        </CardContent>
-      </Card>
+      <span className="flex items-center justify-between gap-4">
+        <span>
+          <span className="block font-medium text-white">{account.label}</span>
+          <span className="mt-1 block text-sm text-[#b8b8be]">{account.email}</span>
+        </span>
+        <span className="text-right text-xs text-[#8a8a92]">
+          {account.description}
+        </span>
+      </span>
     </button>
   );
 }
